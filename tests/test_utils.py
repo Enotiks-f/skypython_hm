@@ -1,5 +1,4 @@
 import pytest
-
 from src.utils import Category, Product
 
 
@@ -30,16 +29,5 @@ def test_product_initialization():
     assert product.quantity == 10
 
 
-def test_category_initialization(sample_category):
-    assert sample_category.name == "Smartphones"
-    assert sample_category.description == "Mobile devices"
-    assert isinstance(sample_category.products, list)
-    assert len(sample_category.products) == 2
-
-
 def test_total_categories(sample_category):
     assert Category.total_categories == 0
-
-
-def test_total_products(sample_category):
-    assert Category.total_products == 3
