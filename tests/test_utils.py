@@ -1,7 +1,7 @@
 import unittest
 import json
 from unittest.mock import mock_open, patch
-from src.utils import Product, Category, read_json
+from skypython_hm.src.utils import Product, Categoy, CategoryIterator, read_json
 
 
 # Тесты для Product
@@ -138,6 +138,33 @@ def test_read_json():
     assert categories[0]._Category__products[0].name == "Product 1"
     assert categories[0]._Category__products[1].price == 2000.0
 
+def test_category_iterator():
+    Category.product_count = 0
+    product1 = Product("Product 1", "Desc 1", 100.0, 2)
+    product2 = Product("Product 2", "Desc 2", 200.0, 5)
+    category = Category("Test Category", "Test Description", [product1, product2])
+
+    iterator = CategoryIterator(category)
+
+    products = list(iterator)
+
+    assert len(products) == 2
+    assert products[0].name == "Product 1"
+    assert products[1].name == "Product 2"
+
+
+def test_category_iterator_stop_iteration():
+    Category.product_count = 0
+    product1 = Product("Product 1", "Desc 1", 100.0, 2)
+    category = Category("Test Category", "Test Description", [product1])
+
+    iterator = CategoryIterator(category)
+    next(iterator)
+    try:
+        next(iterator)
+        assert False, "Ожидалось исключение StopIteration"
+    except StopIteration:
+        pass
 
 if __name__ == '__main__':
     unittest.main()
