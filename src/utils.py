@@ -78,7 +78,7 @@ class Category:
         return self.__products
 
     def __str__(self):
-        return f'{self.name}, количество продуктов: {Category.product_count}.'
+        return f'{self.name}, количество продуктов: {Product.quantity}.'
 
 class CategoryIterator:
 
