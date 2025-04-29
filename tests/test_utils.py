@@ -1,7 +1,7 @@
 import unittest
 import json
 from unittest.mock import mock_open, patch
-from skypython_hm.src.utils import Product, Categoy, CategoryIterator, read_json
+from skypython_hm.src.utils import Product, Category, CategoryIterator, Smartphone, LawnGrass, read_json
 
 
 # Тесты для Product
@@ -165,6 +165,105 @@ def test_category_iterator_stop_iteration():
         assert False, "Ожидалось исключение StopIteration"
     except StopIteration:
         pass
+
+def test_add_product():
+    Category.product_count = 0
+    category = Category("Test", "Desc", [])
+    product = Product("Product", "Desc", 100.0, 1)
+    category.add_product(product)
+    assert product in category.product_list
+    assert Category.product_count == 1
+
+
+def test_add_invalid_product():
+    category = Category("Test", "Desc", [])
+    initial_count = Category.product_count
+    category.add_product("NotAProduct")
+    # Не выбрасывается исключение, но и не добавляется
+    assert len(category.product_list) == 0
+    assert Category.product_count == initial_count
+
+
+def test_category_products_property():
+    p1 = Product("P1", "D1", 100, 1)
+    p2 = Product("P2", "D2", 200, 2)
+    category = Category("Cat", "Desc", [p1, p2])
+    result = category.products
+    assert "P1, 100 руб." in result
+    assert "P2, 200 руб." in result
+
+
+# Тесты для CategoryIterator
+def test_category_iterator():
+    p1 = Product("P1", "D1", 100, 1)
+    p2 = Product("P2", "D2", 200, 2)
+    category = Category("Cat", "Desc", [p1, p2])
+    iterator = iter(CategoryIterator(category))
+    assert next(iterator) == p1
+    assert next(iterator) == p2
+    try:
+        next(iterator)
+        assert False  # должно быть исключение StopIteration
+    except StopIteration:
+        assert True
+
+
+# Тесты для Smartphone
+def test_smartphone_initialization():
+    phone = Smartphone("Phone", "Desc", 1000, 3, 99, "Model", 256, "Black")
+    assert phone.name == "Phone"
+    assert phone.efficiency == 99
+    assert phone.model == "Model"
+    assert phone.memory == 256
+    assert phone.color == "Black"
+
+
+# Тесты для LawnGrass
+def test_lawngrass_initialization():
+    grass = LawnGrass("Grass", "Desc", 300, 5, "Russia", "7 дней", "Green")
+    assert grass.name == "Grass"
+    assert grass.country == "Russia"
+    assert grass.germination_period == "7 дней"
+    assert grass.color == "Green"
+
+
+# Тесты для read_json
+def test_read_json_parses_correctly():
+    mock_data = json.dumps([{
+        "name": "Category1",
+        "description": "Desc1",
+        "products": [
+            {"name": "Prod1", "description": "D1", "price": 10.0, "quantity": 1},
+            {"name": "Prod2", "description": "D2", "price": 20.0, "quantity": 2}
+        ]
+    }])
+
+    with patch("builtins.open", mock_open(read_data=mock_data)):
+        categories = read_json("fakepath.json")
+        assert len(categories) == 1
+        assert categories[0].name == "Category1"
+        assert len(categories[0].product_list) == 2
+        assert categories[0].product_list[0].name == "Prod1"
+
+
+# Проверка на сложение продуктов
+def test_product_addition():
+    p1 = Product("A", "D", 10.0, 2)
+    p2 = Product("B", "D", 15.0, 3)
+    total = p1 + p2
+    assert total == 10.0 * 2 + 15.0 * 3
+
+
+def test_invalid_addition_between_different_types():
+    phone = Smartphone("Phone", "Desc", 1000, 2, 90, "M1", 128, "Black")
+    grass = LawnGrass("Grass", "Desc", 300, 5, "RU", "7 days", "Green")
+    try:
+        result = phone + grass
+    except TypeError:
+        assert True
+    else:
+        assert False, "Ожидалась ошибка TypeError при сложении разных типов"
+
 
 if __name__ == '__main__':
     unittest.main()
