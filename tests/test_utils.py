@@ -1,7 +1,9 @@
-import unittest
 import json
+import unittest
 from unittest.mock import mock_open, patch
-from skypython_hm.src.utils import Product, Category, CategoryIterator, Smartphone, LawnGrass, read_json
+
+from skypython_hm.src.utils import (Category, CategoryIterator, LawnGrass,
+                                    Product, Smartphone, read_json)
 
 
 # Тесты для Product
@@ -18,7 +20,7 @@ def test_new_product_classmethod():
         "name": "New Product",
         "description": "New Description",
         "price": 500.0,
-        "quantity": 5
+        "quantity": 5,
     }
     product = Product.new_product(data)
     assert product.name == "New Product"
@@ -35,7 +37,7 @@ def test_price_setter_positive():
 
 def test_price_setter_negative():
     product = Product("Test Product", "Test Description", 1000.0, 10)
-    with patch('builtins.print') as mocked_print:
+    with patch("builtins.print") as mocked_print:
         product.price = -100.0
         mocked_print.assert_called_with("Цена не должна быть нулевая или отрицательная")
         assert product.price == 1000.0
@@ -43,7 +45,7 @@ def test_price_setter_negative():
 
 def test_price_setter_zero():
     product = Product("Test Product", "Test Description", 1000.0, 10)
-    with patch('builtins.print') as mocked_print:
+    with patch("builtins.print") as mocked_print:
         product.price = 0
         mocked_print.assert_called_with("Цена не должна быть нулевая или отрицательная")
         assert product.price == 1000.0
@@ -51,15 +53,15 @@ def test_price_setter_zero():
 
 def test_price_setter_lower_price_accepted():
     product = Product("Test Product", "Test Description", 1000.0, 10)
-    with patch('builtins.input', return_value='y'):
+    with patch("builtins.input", return_value="y"):
         product.price = 500.0
         assert product.price == 500.0
 
 
 def test_price_setter_lower_price_rejected():
     product = Product("Test Product", "Test Description", 1000.0, 10)
-    with patch('builtins.input', return_value='n'):
-        with patch('builtins.print') as mocked_print:
+    with patch("builtins.input", return_value="n"):
+        with patch("builtins.print") as mocked_print:
             product.price = 500.0
             mocked_print.assert_called_with("Изменения не применены")
             assert product.price == 1000.0
@@ -122,13 +124,23 @@ def test_read_json():
             "name": "Category 1",
             "description": "Desc 1",
             "products": [
-                {"name": "Product 1", "description": "P Desc 1", "price": 1000.0, "quantity": 5},
-                {"name": "Product 2", "description": "P Desc 2", "price": 2000.0, "quantity": 10}
-            ]
+                {
+                    "name": "Product 1",
+                    "description": "P Desc 1",
+                    "price": 1000.0,
+                    "quantity": 5,
+                },
+                {
+                    "name": "Product 2",
+                    "description": "P Desc 2",
+                    "price": 2000.0,
+                    "quantity": 10,
+                },
+            ],
         }
     ]
     mock_file = mock_open(read_data=json.dumps(mock_data))
-    with patch('builtins.open', mock_file):
+    with patch("builtins.open", mock_file):
         categories = read_json("dummy_path.json")
 
     assert len(categories) == 1
@@ -137,6 +149,7 @@ def test_read_json():
     assert len(categories[0]._Category__products) == 2
     assert categories[0]._Category__products[0].name == "Product 1"
     assert categories[0]._Category__products[1].price == 2000.0
+
 
 def test_category_iterator():
     Category.product_count = 0
@@ -166,7 +179,8 @@ def test_category_iterator_stop_iteration():
     except StopIteration:
         pass
 
-def test_add_product():
+
+def test_add_products():
     Category.product_count = 0
     category = Category("Test", "Desc", [])
     product = Product("Product", "Desc", 100.0, 1)
@@ -194,7 +208,7 @@ def test_category_products_property():
 
 
 # Тесты для CategoryIterator
-def test_category_iterator():
+def test_category_iterators():
     p1 = Product("P1", "D1", 100, 1)
     p2 = Product("P2", "D2", 200, 2)
     category = Category("Cat", "Desc", [p1, p2])
@@ -229,14 +243,28 @@ def test_lawngrass_initialization():
 
 # Тесты для read_json
 def test_read_json_parses_correctly():
-    mock_data = json.dumps([{
-        "name": "Category1",
-        "description": "Desc1",
-        "products": [
-            {"name": "Prod1", "description": "D1", "price": 10.0, "quantity": 1},
-            {"name": "Prod2", "description": "D2", "price": 20.0, "quantity": 2}
+    mock_data = json.dumps(
+        [
+            {
+                "name": "Category1",
+                "description": "Desc1",
+                "products": [
+                    {
+                        "name": "Prod1",
+                        "description": "D1",
+                        "price": 10.0,
+                        "quantity": 1,
+                    },
+                    {
+                        "name": "Prod2",
+                        "description": "D2",
+                        "price": 20.0,
+                        "quantity": 2,
+                    },
+                ],
+            }
         ]
-    }])
+    )
 
     with patch("builtins.open", mock_open(read_data=mock_data)):
         categories = read_json("fakepath.json")
@@ -258,12 +286,12 @@ def test_invalid_addition_between_different_types():
     phone = Smartphone("Phone", "Desc", 1000, 2, 90, "M1", 128, "Black")
     grass = LawnGrass("Grass", "Desc", 300, 5, "RU", "7 days", "Green")
     try:
-        result = phone + grass
+        assert phone + grass
     except TypeError:
         assert True
     else:
         assert False, "Ожидалась ошибка TypeError при сложении разных типов"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
