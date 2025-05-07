@@ -2,7 +2,7 @@ import json
 import unittest
 from unittest.mock import mock_open, patch
 from skypython_hm.src.utils import (Category, CategoryIterator, LawnGrass,
-                                    Product, Smartphone, read_json)
+                                    Product, read_json)
 
 # Тесты для Product
 class TestProduct(unittest.TestCase):
@@ -71,7 +71,7 @@ class TestCategory(unittest.TestCase):
         category = Category("Test Category", "Test Description", [product1, product2])
         self.assertEqual(category.name, "Test Category")
         self.assertEqual(category.description, "Test Description")
-        self.assertEqual(len(category._Category__products), 2)
+        self.assertEqual(len(category._products), 2)
         self.assertEqual(Category.product_count, 2)
 
     def test_add_product(self):
@@ -80,7 +80,7 @@ class TestCategory(unittest.TestCase):
         category = Category("Test Category", "Test Description", [product1])
         new_product = Product("Product 2", "Desc 2", 2000.0, 10)
         category.add_product(new_product)
-        self.assertEqual(len(category._Category__products), 2)
+        self.assertEqual(len(category._products), 2)
         self.assertEqual(Category.product_count, 2)
 
 
@@ -94,6 +94,17 @@ class TestCategory(unittest.TestCase):
             "Product 2, 2000.0 руб. Остаток: 10 шт."
         )
         self.assertEqual(category.products, expected_output)
+
+    def test_middle_price_with_products(self):
+        product1 = Product("Телефон", "Описание", 10000.0, 2)
+        product2 = Product("Наушники", "Описание", 5000.0, 5)
+        category = Category("Электроника", "Описание", [product1, product2])
+        expected_avg = (product1.price + product2.price) / 2
+        self.assertEqual(category.middle_price(), expected_avg)
+
+    def test_middle_price_without_products(self):
+        category = Category("Пустая категория", "Нет товаров", [])
+        self.assertEqual(category.middle_price(), "Товары в 0 кол-во")
 
 
 # Тесты для read_json
@@ -128,9 +139,9 @@ class TestReadJson(unittest.TestCase):
         self.assertEqual(len(categories), 1)
         self.assertEqual(categories[0].name, "Category 1")
         self.assertEqual(categories[0].description, "Desc 1")
-        self.assertEqual(len(categories[0]._Category__products), 2)
-        self.assertEqual(categories[0]._Category__products[0].name, "Product 1")
-        self.assertEqual(categories[0]._Category__products[1].price, 2000.0)
+        self.assertEqual(len(categories[0]._products), 2)
+        self.assertEqual(categories[0]._products[0].name, "Product 1")
+        self.assertEqual(categories[0]._products[1].price, 2000.0)
 
 
 # Тесты для CategoryIterator
@@ -171,7 +182,7 @@ class TestAddProductMethod(unittest.TestCase):
         category = Category("Test Category", "Test Description", [product1])
 
         category.add_product(product2)
-        self.assertEqual(len(category._Category__products), 2)
+        self.assertEqual(len(category._products), 2)
         self.assertEqual(Category.product_count, 2)
 
 
