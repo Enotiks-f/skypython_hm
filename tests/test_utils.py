@@ -1,8 +1,7 @@
 import json
 import unittest
 from unittest.mock import mock_open, patch
-from skypython_hm.src.utils import (Category, CategoryIterator, LawnGrass,
-                                    Product, read_json)
+from src.utils import Category, CategoryIterator, LawnGrass, Product, read_json
 
 # Тесты для Product
 class TestProduct(unittest.TestCase):

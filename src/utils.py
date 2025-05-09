@@ -40,11 +40,6 @@ class MixinMro:
 
 
 class Product(BaseProduct, MixinMro):
-    name: str
-    description: str
-    price: float
-    quantity: int
-
     def __init__(self, name, description, price, quantity):
         if quantity <= 0:
             raise ValueError("Товар с нулевым количеством не может быть добавлен")
@@ -123,11 +118,7 @@ class Category(BaseOrderCategory):
         return [self._products]
 
     def add_product(self, product):
-        if (
-            isinstance(product, Product)
-            or issubclass(Smartphone, Product)
-            or issubclass(LawnGrass, Product)
-        ):
+        if isinstance(product, Product):
             self._products.append(product)
             Category.product_count += 1
 
@@ -173,7 +164,7 @@ class Smartphone(Product):
 
     def __add__(self, other):
         if type(other) is LawnGrass:
-            return self._price * self.quantity + other.quantity + other.quantity
+            return self.price * self.quantity + other.price * other.quantity
         raise TypeError
 
 
@@ -192,7 +183,7 @@ class LawnGrass(Product):
 
     def __add__(self, other):
         if type(other) is LawnGrass:
-            return self._price * self.quantity + other.quantity + other.quantity
+            return self.price * self.quantity + other.price * other.quantity
         raise TypeError
 
 
