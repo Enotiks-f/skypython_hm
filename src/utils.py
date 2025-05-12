@@ -145,7 +145,7 @@ class Category(BaseOrderCategory):
                 count += i.price
             return count / len(self._products)
         except ZeroDivisionError as o:
-            return "Товары в 0 кол-во"
+            return 0
 
 class Smartphone(Product):
     efficiency: int
